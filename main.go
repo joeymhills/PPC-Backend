@@ -6,6 +6,7 @@ import (
     "io"
     "encoding/json"
     "sort"
+    "os"
 )
 
 type Player struct {
@@ -167,6 +168,13 @@ func GetInfo(w http.ResponseWriter, r *http.Request) {
 func main() {
 
     http.HandleFunc("/GetInfo", GetInfo)
+   
     log.Println("Listening and serving CONCURRENTLY")
-    http.ListenAndServe(":8080", nil)
+    
+    PORT := os.Getenv("PORT")
+    if PORT == "" {
+        PORT = "3333"
+    }
+    http.ListenAndServe("0.0.0.0:"+PORT, nil)
+
 }
