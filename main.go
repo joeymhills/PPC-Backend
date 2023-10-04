@@ -127,6 +127,7 @@ func GetInfo(w http.ResponseWriter, r *http.Request) {
     }
     url := string(body1)
     url = url + "/players_sessions"
+    log.Println(url)
     
     req, err := http.NewRequest("GET", url, nil)
     if err != nil {
@@ -134,7 +135,7 @@ func GetInfo(w http.ResponseWriter, r *http.Request) {
     }
     res, err := http.DefaultClient.Do(req)
     if err != nil {
-        log.Fatal("err on line 41", err)
+        log.Fatal("err on line 137", err)
     }
     defer res.Body.Close()
     
@@ -150,7 +151,7 @@ func GetInfo(w http.ResponseWriter, r *http.Request) {
     var playerarray []Player
     err = json.Unmarshal(*game.Players, &playermap)
     if err != nil {
-        log.Fatal("err in line 86", err)
+        log.Fatal("err on line 153", err)
     }
      for _, value := range playermap {
         playerarray = append(playerarray, value)
