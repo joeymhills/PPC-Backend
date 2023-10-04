@@ -162,6 +162,10 @@ func GetInfo(w http.ResponseWriter, r *http.Request) {
         playerarray = append(playerarray, value)
     }
     payments := CalculatePayments(playerarray)
+    
+    w.Header().Set("Access-Control-Allow-Headers", "Origin, Authorization, Content-Type, Accept")
+    w.Header().Set("Access-Control-Allow-Origin", "*")
+    w.Header().Set("Content-Type", "application/json")
     json.NewEncoder(w).Encode(payments)
 
 }  
