@@ -104,10 +104,6 @@ func CalculatePayments(playersarray []Player) []Payment {
         payer.Net = payer.Net + amount
         reciever.Net = reciever.Net - amount
         
-        log.Println(payment)
-        log.Println("payer:", payer.Names[0], payer.Net)
-        log.Println("reciever:", reciever.Names[0], reciever.Net)
-
         if payer.Net == 0 {
             payers = payers[1:]
         }
@@ -117,8 +113,6 @@ func CalculatePayments(playersarray []Player) []Payment {
         payments = append(payments, payment)
 
     }
-    log.Println("payers:", payers)
-    log.Println("recievers:", recievers)
 
 log.Println("payments:", payments)
 return payments
