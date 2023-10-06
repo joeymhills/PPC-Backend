@@ -125,6 +125,7 @@ func GetInfo(w http.ResponseWriter, r *http.Request) {
     if err != nil {
         log.Fatal("err in request", err)
     }
+    log.Println(string(body1))
     url := string(body1)
     url = url + "/players_sessions"
     log.Println(url)
@@ -158,7 +159,6 @@ func GetInfo(w http.ResponseWriter, r *http.Request) {
     }
     payments := CalculatePayments(playerarray)
     
-    w.Header().Set("Access-Control-Allow-Headers", "Origin, Authorization, Content-Type, Accept")
     w.Header().Set("Access-Control-Allow-Origin", "*")
     w.Header().Set("Content-Type", "application/json")
     json.NewEncoder(w).Encode(payments)
