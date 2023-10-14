@@ -2,6 +2,7 @@ package main
 
 import (
     "log"
+    "errors"
     "net/http"
     "io"
     "encoding/json"
@@ -73,9 +74,9 @@ func GetPlayersInfos() {
 }
 */
 
-func CalculatePayments(playersarray []Player) []Payment {
+func CalculatePayments(playersarray []Player) ([]Payment, error) {
     var payments []Payment
-    
+    var err error = nil
     var payers []Player
     var recievers []Player
 
@@ -114,8 +115,12 @@ func CalculatePayments(playersarray []Player) []Payment {
 
     }
 
-log.Println("payments:", payments)
-return payments
+    if len(payers) > 0 || len(recievers) > 0 {
+        err = errors.New("Error in calculating payments")
+    }
+
+
+    return payments, err 
 }
 
 func GetInfo(w http.ResponseWriter, r *http.Request) {
@@ -123,20 +128,21 @@ func GetInfo(w http.ResponseWriter, r *http.Request) {
     var game Game
     body1, err := io.ReadAll(r.Body)
     if err != nil {
-        log.Fatal("err in request", err)
+        http.Error(w, err.Error(), 500)
+        return
     }
-    log.Println(string(body1))
     url := string(body1)
     url = url + "/players_sessions"
-    log.Println(url)
     
     req, err := http.NewRequest("GET", url, nil)
     if err != nil {
-        log.Fatal("err in reaching pokernow", err)
+        http.Error(w, err.Error(), 500)
+        return
     }
     res, err := http.DefaultClient.Do(req)
     if err != nil {
-        log.Fatal("err on line 137", err)
+        http.Error(w, err.Error(), 500)
+        return
     }
     defer res.Body.Close()
     
@@ -144,7 +150,8 @@ func GetInfo(w http.ResponseWriter, r *http.Request) {
 
     err = json.Unmarshal(body, &game)
     if err != nil {
-        log.Fatal("err in unmarshal", err)
+        http.Error(w, err.Error(), 500)
+        return
     }
     
 
@@ -152,13 +159,26 @@ func GetInfo(w http.ResponseWriter, r *http.Request) {
     var playerarray []Player
     err = json.Unmarshal(*game.Players, &playermap)
     if err != nil {
-        log.Fatal("err on line 153", err)
+        http.Error(w, err.Error(), 500)
+        return
     }
      for _, value := range playermap {
         playerarray = append(playerarray, value)
     }
-    payments := CalculatePayments(playerarray)
+
+    if len(playerarray) == 0 {
+        err = errors.New("Game does not exist.")
+        http.Error(w, err.Error(), 500)
+        return
+    } 
+
+    payments, err := CalculatePayments(playerarray)
     
+    if err != nil {
+        http.Error(w, err.Error(), 500)
+        return
+    }
+
     w.Header().Set("Access-Control-Allow-Origin", "*")
     w.Header().Set("Content-Type", "application/json")
     json.NewEncoder(w).Encode(payments)
@@ -166,9 +186,9 @@ func GetInfo(w http.ResponseWriter, r *http.Request) {
 }  
 func main() {
 
-    http.HandleFunc("/GetInfo", GetInfo)
-   
     log.Println("Listening and serving CONCURRENTLY")
+    
+    http.HandleFunc("/GetInfo", GetInfo)
     
     PORT := os.Getenv("PORT")
     if PORT == "" {
