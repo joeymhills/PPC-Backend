@@ -1,1 +1,1 @@
-# go-payout-calc
+# Backend for our poker payout calculator for PokerNow.com
