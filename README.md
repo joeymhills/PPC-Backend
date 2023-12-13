@@ -1,1 +1,1 @@
-# Backend for our poker payout calculator for PokerNow.com
+Backend for our poker payout calculator for PokerNow.com
